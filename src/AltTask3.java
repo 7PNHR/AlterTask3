@@ -1,36 +1,36 @@
 import java.io.*;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 
 public class AltTask3 {
 
     public static void main(String[] args) {
         char[][] maze = getMazeByFileName("Filename.txt");//Сначала столбец, затем строка [N столбца][N строки]
-        getWayInMaze(maze);
+        char[][] mazeWithWay = getWayInMaze(maze);
     }
 
     static char[][] getWayInMaze(char[][] maze) {
-        int[] startPosition = getStartedPosition(maze);
-        int[] finishPosition = getFinishedPosition(maze);
+        int length = maze.length;
+        Point startPosition = getStartedPosition(maze);
+        ArrayDeque<Point> queue = new ArrayDeque<>();
+        queue.add(startPosition);
+        while(!queue.isEmpty()){
+            Point p = queue.pop();
+
+        }
         return null;
     }
 
-    static int[] getStartedPosition(char[][] maze){
-        return findSymbolPosition(maze,'s');
+    static void doResearch(char[][] maze, ArrayList<Point> list){
+
     }
 
-    static int[] getFinishedPosition(char[][] maze){
-        return findSymbolPosition(maze,'f');
-    }
 
-    /**
-     * Находим заданную точку
-     * возвращает массив из 2 точек, где 1 точка номер столбца
-     * а вторая номер строки
-     */
-    static int[] findSymbolPosition(char[][] maze, char symbol) {
+    static Point getStartedPosition(char[][] maze) {
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze.length; j++) {
-                if(maze[j][i]==symbol)
-                    return new int[]{j,i};
+                if(maze[j][i]=='s')
+                    return new Point(j,i);
             }
         }
         return null;

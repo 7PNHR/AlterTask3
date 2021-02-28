@@ -1,36 +1,62 @@
 import java.io.*;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 
 public class AltTask3 {
 
+    static char[][] result;
+
     public static void main(String[] args) {
         char[][] maze = getMazeByFileName("Filename.txt");//Сначала столбец, затем строка [N столбца][N строки]
-        char[][] mazeWithWay = getWayInMaze(maze);
+        char[][] result = getWayInMaze(maze);
+        print(result);
     }
 
     static char[][] getWayInMaze(char[][] maze) {
         int length = maze.length;
         Point startPosition = getStartedPosition(maze);
-        ArrayDeque<Point> queue = new ArrayDeque<>();
-        queue.add(startPosition);
-        while(!queue.isEmpty()){
-            Point p = queue.pop();
+        doResearch(maze, startPosition);
+        result[startPosition.Y][startPosition.X]='s';
+        return result;
+    }
 
+    static void doResearch(char[][] maze, Point p) {
+        maze = getClone(maze);
+        if (maze[p.Y][p.X] == 'f') {
+            result=maze;
+            return;
         }
-        return null;
+        maze[p.Y][p.X] = '*';
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dy = -1; dy <= 1; dy++) {
+                if ((Math.abs(dx + dy) != 1)
+                        || (p.X + dx < 0 || p.X + dx >= maze.length || p.Y + dy < 0 || p.Y + dy >= maze.length)
+                        || (maze[p.Y + dy][p.X + dx] != '.' && maze[p.Y + dy][p.X + dx] != 'f')) ;
+                else doResearch(maze.clone(), new Point(p.X + dx, p.Y + dy));
+            }
+        }
     }
 
-    static void doResearch(char[][] maze, ArrayList<Point> list){
-
+    static char[][] getClone(char[][] array) {
+        char[][] newArray = new char[array.length][array.length];
+        for (int i = 0; i < array.length; i++)
+            System.arraycopy(array[i], 0, newArray[i], 0, array.length);
+        return newArray;
     }
 
+    static void print(char[][] maze) {
+        for (char[] chars : maze) {
+            for (int j = 0; j < maze.length; j++) {
+                System.out.print(chars[j]);
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
 
     static Point getStartedPosition(char[][] maze) {
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze.length; j++) {
-                if(maze[j][i]=='s')
-                    return new Point(j,i);
+                if (maze[j][i] == 's')
+                    return new Point(i, j);
             }
         }
         return null;

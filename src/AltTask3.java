@@ -16,6 +16,7 @@ public class AltTask3 {
         print(maze);
     }
 
+    //region Основные методы
     public static char[][] findWayInMaze(String fileName) {
         char[][] maze = getMazeByFileName(fileName);//Сначала столбец, затем строка [N столбца][N строки]
         return getSolvedMaze(maze);
@@ -38,8 +39,8 @@ public class AltTask3 {
         if (maze[p.Y][p.X] == 'f')
             return maze;
         maze[p.Y][p.X] = '*';
-        for (int dx = -1; dx <= 1; dx++) {
-            for (int dy = -1; dy <= 1; dy++) {
+        for (int dx = 1; dx >= -1; dx--) {
+            for (int dy = 1; dy >= -1; dy--) {
                 if (!((Math.abs(dx + dy) != 1)
                         || (p.X + dx < 0 || p.X + dx >= maze.length || p.Y + dy < 0 || p.Y + dy >= maze.length)
                         || (maze[p.Y + dy][p.X + dx] != '.' && maze[p.Y + dy][p.X + dx] != 'f'))) {
@@ -50,21 +51,15 @@ public class AltTask3 {
         }
         return null;
     }
-
-    static Point findStartedPosition(char[][] maze) {
-        Point result = new Point(0, 0);
-        for (int i = 0; i < maze.length; i++)
-            for (int j = 0; j < maze.length; j++)
-                if (maze[j][i] == 's')
-                    result = new Point(i, j);
-        return result;
-    }
-//region Получение массива чаров из файла
+//endregion
+    //region Получение массива чаров из файла
     static char[][] getMazeByFileName(String fileName) {
-        char[] array = new char[1000];
+        File file = new File(fileName);
+        int fileLength = (int) file.length();
+        char[] array = new char[fileLength];
         char[][] maze = new char[1][1];
-        try (FileReader file2 = new FileReader(fileName);) {
-            int value = file2.read(array);
+        try (FileReader file2 = new FileReader(fileName)) {
+            file2.read(array);
             int length = getLength(array);
             maze = getMaze(array, length);
         } catch (IOException e) {
@@ -74,20 +69,19 @@ public class AltTask3 {
     }
 
     static char[][] getMaze(char[] symbols, int length) {
-        int i = 0;
         int x = 0;
         int y = 0;
         char[][] maze = new char[length][length];
-        while (symbols[i] != '\u0000')
+        for (int i = 0; i < symbols.length; i++) {
             if (symbols[i] == '\r') {
                 x = 0;
                 y++;
-                i += 2;
+                i++;
             } else {
                 maze[y][x] = symbols[i];
-                i++;
                 x++;
             }
+        }
         return maze;
     }
 
@@ -98,7 +92,7 @@ public class AltTask3 {
         return i;
     }
 //endregion
-//region Вспомогательные методы (клонирование массива, вывод массива чаров)
+    //region Вспомогательные методы (клонирование массива, вывод массива чаров, нахождение начала лабиринта)
     static char[][] getClone(char[][] array) {
         char[][] newArray = new char[array.length][array.length];
         for (int i = 0; i < array.length; i++)
@@ -118,6 +112,15 @@ public class AltTask3 {
             System.out.println();
         }
         System.out.println();
+    }
+
+    static Point findStartedPosition(char[][] maze) {
+        Point result = new Point(0, 0);
+        for (int i = 0; i < maze.length; i++)
+            for (int j = 0; j < maze.length; j++)
+                if (maze[j][i] == 's')
+                    result = new Point(i, j);
+        return result;
     }
 //endregion
 }

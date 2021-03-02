@@ -2,37 +2,53 @@ import java.io.*;
 
 public class AltTask3 {
 
-    static char[][] result;
+    public static char[][] findWayInMaze(String fileName) {
+        char[][] maze = getMazeByFileName(fileName);//Сначала столбец, затем строка [N столбца][N строки]
+        return findWayInMaze(maze);
+    }
+
+    public static char[][] findWayInMaze(char[][] maze) {
+        return getWayInMaze(maze);
+    }
 
     public static void main(String[] args) {
-        char[][] maze = getMazeByFileName("Filename.txt");//Сначала столбец, затем строка [N столбца][N строки]
-        char[][] result = getWayInMaze(maze);
-        print(result);
+        char[][] maze = findWayInMaze("Filename.txt");
+        print(maze);
+        maze = findWayInMaze("BigMaze.txt");
+        print(maze);
+        maze = new char[][]{
+                {'s', '.', '.'},
+                {'.', '.', '.'},
+                {'.', '.', 'f'}
+        };
+        maze = findWayInMaze(maze);
+        print(maze);
     }
 
     static char[][] getWayInMaze(char[][] maze) {
-        int length = maze.length;
         Point startPosition = getStartedPosition(maze);
-        doResearch(maze, startPosition);
-        result[startPosition.Y][startPosition.X]='s';
+        char[][] result = doResearch(maze, startPosition);
+        if (result != null)
+            result[startPosition.Y][startPosition.X] = 's';
         return result;
     }
 
-    static void doResearch(char[][] maze, Point p) {
+    static char[][] doResearch(char[][] maze, Point p) {
         maze = getClone(maze);
-        if (maze[p.Y][p.X] == 'f') {
-            result=maze;
-            return;
-        }
+        if (maze[p.Y][p.X] == 'f')
+            return maze;
         maze[p.Y][p.X] = '*';
         for (int dx = -1; dx <= 1; dx++) {
             for (int dy = -1; dy <= 1; dy++) {
-                if ((Math.abs(dx + dy) != 1)
+                if (!((Math.abs(dx + dy) != 1)
                         || (p.X + dx < 0 || p.X + dx >= maze.length || p.Y + dy < 0 || p.Y + dy >= maze.length)
-                        || (maze[p.Y + dy][p.X + dx] != '.' && maze[p.Y + dy][p.X + dx] != 'f')) ;
-                else doResearch(maze.clone(), new Point(p.X + dx, p.Y + dy));
+                        || (maze[p.Y + dy][p.X + dx] != '.' && maze[p.Y + dy][p.X + dx] != 'f'))){
+                    char[][] researchResult = doResearch(maze.clone(), new Point(p.X + dx, p.Y + dy));
+                    if(researchResult!=null) return researchResult;
+                }
             }
         }
+        return null;
     }
 
     static char[][] getClone(char[][] array) {
@@ -43,6 +59,10 @@ public class AltTask3 {
     }
 
     static void print(char[][] maze) {
+        if (maze == null) {
+            System.out.println("Налл");
+            return;
+        }
         for (char[] chars : maze) {
             for (int j = 0; j < maze.length; j++) {
                 System.out.print(chars[j]);
@@ -69,7 +89,6 @@ public class AltTask3 {
             file2.read(array);
             int length = getLength(array);
             maze = getMaze(array, length);
-            System.out.println("123");
         } catch (IOException e) {
             e.printStackTrace();
         }

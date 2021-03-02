@@ -2,15 +2,6 @@ import java.io.*;
 
 public class AltTask3 {
 
-    public static char[][] findWayInMaze(String fileName) {
-        char[][] maze = getMazeByFileName(fileName);//Сначала столбец, затем строка [N столбца][N строки]
-        return findWayInMaze(maze);
-    }
-
-    public static char[][] findWayInMaze(char[][] maze) {
-        return getWayInMaze(maze);
-    }
-
     public static void main(String[] args) {
         char[][] maze = findWayInMaze("Filename.txt");
         print(maze);
@@ -25,15 +16,24 @@ public class AltTask3 {
         print(maze);
     }
 
-    static char[][] getWayInMaze(char[][] maze) {
-        Point startPosition = getStartedPosition(maze);
-        char[][] result = doResearch(maze, startPosition);
+    public static char[][] findWayInMaze(String fileName) {
+        char[][] maze = getMazeByFileName(fileName);//Сначала столбец, затем строка [N столбца][N строки]
+        return getSolvedMaze(maze);
+    }
+
+    public static char[][] findWayInMaze(char[][] maze) {
+        return getSolvedMaze(maze);
+    }
+
+    static char[][] getSolvedMaze(char[][] maze) {
+        Point startPosition = findStartedPosition(maze);
+        char[][] result = findWayInMaze(maze, startPosition);
         if (result != null)
             result[startPosition.Y][startPosition.X] = 's';
         return result;
     }
 
-    static char[][] doResearch(char[][] maze, Point p) {
+    static char[][] findWayInMaze(char[][] maze, Point p) {
         maze = getClone(maze);
         if (maze[p.Y][p.X] == 'f')
             return maze;
@@ -42,51 +42,29 @@ public class AltTask3 {
             for (int dy = -1; dy <= 1; dy++) {
                 if (!((Math.abs(dx + dy) != 1)
                         || (p.X + dx < 0 || p.X + dx >= maze.length || p.Y + dy < 0 || p.Y + dy >= maze.length)
-                        || (maze[p.Y + dy][p.X + dx] != '.' && maze[p.Y + dy][p.X + dx] != 'f'))){
-                    char[][] researchResult = doResearch(maze.clone(), new Point(p.X + dx, p.Y + dy));
-                    if(researchResult!=null) return researchResult;
+                        || (maze[p.Y + dy][p.X + dx] != '.' && maze[p.Y + dy][p.X + dx] != 'f'))) {
+                    char[][] researchResult = findWayInMaze(maze.clone(), new Point(p.X + dx, p.Y + dy));
+                    if (researchResult != null) return researchResult;
                 }
             }
         }
         return null;
     }
 
-    static char[][] getClone(char[][] array) {
-        char[][] newArray = new char[array.length][array.length];
-        for (int i = 0; i < array.length; i++)
-            System.arraycopy(array[i], 0, newArray[i], 0, array.length);
-        return newArray;
-    }
-
-    static void print(char[][] maze) {
-        if (maze == null) {
-            System.out.println("Налл");
-            return;
-        }
-        for (char[] chars : maze) {
-            for (int j = 0; j < maze.length; j++) {
-                System.out.print(chars[j]);
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
-
-    static Point getStartedPosition(char[][] maze) {
-        for (int i = 0; i < maze.length; i++) {
-            for (int j = 0; j < maze.length; j++) {
+    static Point findStartedPosition(char[][] maze) {
+        Point result = new Point(0, 0);
+        for (int i = 0; i < maze.length; i++)
+            for (int j = 0; j < maze.length; j++)
                 if (maze[j][i] == 's')
-                    return new Point(i, j);
-            }
-        }
-        return null;
+                    result = new Point(i, j);
+        return result;
     }
-
+//region Получение массива чаров из файла
     static char[][] getMazeByFileName(String fileName) {
         char[] array = new char[1000];
         char[][] maze = new char[1][1];
         try (FileReader file2 = new FileReader(fileName);) {
-            file2.read(array);
+            int value = file2.read(array);
             int length = getLength(array);
             maze = getMaze(array, length);
         } catch (IOException e) {
@@ -119,5 +97,27 @@ public class AltTask3 {
             i++;
         return i;
     }
+//endregion
+//region Вспомогательные методы (клонирование массива, вывод массива чаров)
+    static char[][] getClone(char[][] array) {
+        char[][] newArray = new char[array.length][array.length];
+        for (int i = 0; i < array.length; i++)
+            System.arraycopy(array[i], 0, newArray[i], 0, array.length);
+        return newArray;
+    }
 
+    static void print(char[][] maze) {
+        if (maze == null) {
+            System.out.println("Налл");
+            return;
+        }
+        for (char[] chars : maze) {
+            for (int j = 0; j < maze.length; j++) {
+                System.out.print(chars[j]);
+            }
+            System.out.println();
+        }
+        System.out.println();
+    }
+//endregion
 }
